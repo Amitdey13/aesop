@@ -1,13 +1,39 @@
+@import url(//db.onlinewebfonts.com/c/88f10bf18a36407ef36bf30bc25a3618?family=Suisse+Intl);
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: -apple-system, BlinkMacSystemFont, 'Suisse+Intl', 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  -moz-osx-font-smoothing: grayscale; 
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+  }
+
+.hover:hover .leftin{
+  transform: translateX(0px);
+}
+.hover:hover .rightin{
+  transform: translateX(0px);
+}
+.border-show{
+  border-bottom: 1px white solid;
+  transition: 0.3s ease-in-out;
+  margin: 10px 0px;
+}
+.hover2:hover .border-show{
+  border-bottom: 1px black solid;
+}
+.email{
+  margin-bottom: 15px;
+  color:white;
+  font-size: 23px;
+  width: 100%;
+  background-color: #333333;
+  border-radius: 5px;
+  height: 35px;
+  border-color: #fff;
 }
