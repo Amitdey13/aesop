@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import home from "./home.webp";
+import home3 from "./home3.webp";
 
 
 
@@ -7,19 +8,23 @@ export const StyledApp = styled.div`
     display: flex;
     flex-direction: column;
     width: 100%;
-    overflow-x: hidden;
+    overflow-x:hidden;
+    background-color: rgb(183, 208, 204);
+    @media (min-width:640px){
+      background-color: rgb(255, 255, 255);
+    }
     `;
     
 export const StyledTopbar = styled.div`
-  text-align: ${(props) => (props.center ? "center" : "start")};
+  text-align: ${(props) => (props.textcenter ? "center" : "start")};
   font-family: Suisse Regular, sans-serif;
   font-size: ${(props) => (props.small ? "14px" : "16px")};
   background: #252525;
   color: #fffef2;
   z-index: 10;
-  align-items: center
-  font-weight: lighter;
-  justify-content: ${(props) => (props.start ? "start" : "center")};
+  align-items: center;
+  font-weight: 400;
+  justify-content: center;
   padding: ${(props) => (props.padding ? "12px 40px 12px 40px" : "0px")};
   line-height: ${(props) => (props.lineheight ? "21px" : "normal")};
   display: flex;
@@ -33,36 +38,51 @@ export const StyledTopbar = styled.div`
 `;
 
 export const StyledHome = styled.div`
+background: url(${home3});
+background-repeat: no-repeat;
+background-size: 100%;
+display: block;
+transition: 0.5s ease-in-out;
+margin-bottom: 50px;
+@media only screen and (min-width: 640px) {
   background: url(${home});
   background-repeat: no-repeat;
-  display: block;
-  transition: 0.5s ease-in-out;
   background-size: 125%;
-  margin-bottom: 50px;
   background-position-x: 53%;
   background-position-y: 100%;
+};
+@media (min-width:0px){
+    background-position-x: center;
+    height: 85vh;
+  }
 `;
-
-export const StyledNav = styled.nav`
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-  z-index: 100;
-  padding: 30px 0px 30px 0px;
-`;
-
-export const StyledNavDiv = styled.div`
-  padding: 0px 40px;
-  display: flex;
-  font-size: 16px;
-  letter-spacing: normal;                           
-`;
-
-export const StyledHomeDiv = styled.div`
+  
+  export const StyledNav = styled.nav`
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    z-index: 100;
+    padding: 30px 0px 30px 0px;
+  `;
+  
+  export const StyledNavDiv = styled.div`
+    display: flex;
+    padding: 0px 40px;
+    font-size: 16px;
+    letter-spacing: normal;
+  `;
+  
+  export const StyledHomeDiv = styled.div`
+  // background-color: rgb(183, 208, 204);
   display: flex;
   align-items: flex-start;
-  padding-top: 120px;
-  padding-bottom:100px;   
+  flex-direction: column;
+  padding: 0px;
+  @media (min-width: 640px) {
+    flex-direction: row;
+    padding-top: 120px;
+    padding-bottom: 100px;
+  }
 `;
 
 export const StyledNavLink = styled.div`
@@ -84,14 +104,23 @@ export const StyledNavLink = styled.div`
   &:hover:after {
     transform: scaleX(1);
   }
-`;
-
-
-export const StyledHomeText = styled.div`
+  `;
+  
+  
+  export const StyledHomeText = styled.div`
+  // background-color: rgb(183, 208, 204);
   margin-left: 80px;
   display: flex;
+  width: 426px;
   flex-direction: column;
+  position: relative;
   text-align: start;
+  @media (max-width: 640px){
+    margin: 0px;
+    width: 80%;
+    top: 38vh;
+    padding: 0% 10%;
+  }
 `;
 export const StyleddHomeTextHeading = styled.div`
   font-family: Suisse Medium, sans-serif;
@@ -127,57 +156,72 @@ export const StyledButton = styled.button`
 
 export const StyledDiv = styled.div`
   display: flex;
-  text-align:center;
+  text-align: center;
   padding: 0px 40px 150px 40px;
+  background-color: #fff;
   flex-direction: column;
-`
+`;
 
 export const StyledContainer1 = styled.div`
     display:flex;
     padding-bottom:150px;
-`
-
-export const StyledContainer1Text = styled.div`
-  display:flex;
-  flex-direction: column;
-  color: #333333;
-  font-size: 16px;
-  padding: ${props=>props.right?"0px 80px 0px 0px":"0px 0px 0px 80px"};
-`
-export const StyledContainer1Head = styled.div`
-  font-size: 30px;
-  line-height: 39.9px;
-  margin-bottom: 30px;
-`
-export const StyledContainer1Tag = styled.div`
-  font-size: 14px;
-  line-height: 23.8px;
-  margin-bottom: 20px;
-  font-weight: 500;
-`
+    background-color: #fff;
+    @media (max-width: 640px){
+      flex-direction: column;
+    }
+    `
+    
+    export const StyledContainer1Text = styled.div`
+    display:flex;
+    flex-direction: column;
+    color: #333333;
+    font-size: 16px;
+    padding: ${props => props.right ? "0px 80px 0px 0px" : "0px 0px 0px 80px"};
+    @media (max-width: 640px){
+      width: 90%;
+      padding: 5%;
+    }
+    `
+    export const StyledContainer1Head = styled.div`
+    font-size: 30px;
+    line-height: 39.9px;
+    margin-bottom: 30px;
+    `
+    export const StyledContainer1Tag = styled.div`
+    font-size: 14px;
+    line-height: 23.8px;
+    margin-bottom: 20px;
+    font-weight: 500;
+    `
 export const StyledContainer1Description = styled.div`
-  line-height: 27.2px;
-  margin-bottom: 30px;
-  width: 426px;
+line-height: 27.2px;
+margin-bottom: 30px;
 `
 export const StyledProduct = styled.div`
-  font-size: 16px;
-  display: flex;
+font-size: 16px;
+background-color: #fff;
+display: flex;
   padding-bottom: 150px;
   flex-direction: column;
 `
 export const StyledProductList = styled.div`
   display: flex;
   transition: 0.6s ease-in-out;
-  left:80px;
-  transform: translateX(${(props) => props.slide}px);
+  left: 80px;
+  transform: translateX(${(props) => props.slide});
   position: relative;
+  @media (max-width: 640px) {
+  left: 0px;
+  }
 `;
 export const StyledPagination = styled.div`
   height: 2px;
-  width: 100%;
   background: #cccccc;
   margin: 0px 80px 40px 80px;
+  @media (max-width: 640px) {
+    width: 90%;
+    margin: 0% 5%;
+  }
 `;
 export const StyledPaginationProgress = styled.div`
   width: ${props=>props.part};
@@ -204,20 +248,24 @@ export const StyledScrollButton = styled.div`
 `;
 
 export const StyledProductContainer = styled.div`
-min-width: 453px;
-max-width: 453px;
-display: flex;
-align-items:center;
-flex-direction: column;
-cursor: pointer;
-margin-bottom: 50px;
-justify-content: flex-end;
-`
+  min-width: 453px;
+  max-width: 453px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  cursor: pointer;
+  margin-bottom: 50px;
+  justify-content: flex-end;
+`;
 export const StyledFooterbar = styled.div`
   display: flex;
+  flex-wrap: wrap;
   width: 100%;
   margin-bottom: 10px;
-`
+  @media (max-width: 640px) {
+    justify-content: space-between;
+  }
+`;
 export const StyledFootercard1 = styled.div`
   display: flex;
   margin-bottom: 10px;
@@ -232,6 +280,9 @@ text-align: start;
 margin-bottom: 10px;
 width:17%;
 margin-right:3%;
+@media (max-width:640px){
+  min-width: 40vw;
+}
 `;
 
 export const StyledFootercardhead = styled.div`
