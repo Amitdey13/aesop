@@ -3,6 +3,19 @@ import home from "./home.webp";
 import home3 from "./home3.webp";
 
 
+export const StyledSlide = styled.div`
+  display: flex;
+  height: 100vh;
+  width: 300px;
+  padding: 50px 150px;
+  background-color: #fff;
+  position: fixed;
+  z-index: 1000;
+  flex-direction: column;
+  right: 0;
+  transform: translateX(600px);
+  transition: ease-in-out 0.5s;
+`;
 
 export const StyledApp = styled.div`
     display: flex;
@@ -88,6 +101,8 @@ margin-bottom: 50px;
 export const StyledNavLink = styled.div`
   cursor: pointer;
   color: #333333;
+  display:flex;
+  align-items:center;
   text-align: left;
   font-family: Suisse Medium, sans-serif;
   font-size: 14px;

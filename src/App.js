@@ -27,11 +27,14 @@ import {
   StyledFootercard1,
   StyledFootercard2,
   StyledFootercardhead,
-  StyledFootercardtext
+  StyledFootercardtext,
+  StyledSlide
 } from "./styledComponents";
+import {useSelector, useDispatch} from "react-redux"
 import { AiOutlineArrowRight } from "react-icons/ai";
 import { ImArrowUpRight2 } from "react-icons/im";
 import { HiMenuAlt4 } from "react-icons/hi";
+import { RiAccountCircleFill } from "react-icons/ri";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import cleansing from "./cleansing.webp";
 import commitment from "./commitment.jpg";
@@ -58,15 +61,32 @@ import p12 from "./img/p12.webp";
 import p13 from "./img/p13.webp";
 import p14 from "./img/p14.webp";
 import p15 from "./img/p15.webp";
+import {updateIsLoggedIn} from "./features/isLoggedIn/isLoggedInSlice"
+import {updateEmail} from "./features/email/emailSlice"
+import {updatePassword} from "./features/password/passwordSlice"
+import { updateUserName } from "./features/userName/userNameSlice"
+import axios from "axios";
 
 function App() {
+  // values
   const [firstProduct, setFirstProduct] = useState(0);
   const [secondProduct, setSecondProduct] = useState(0);
   const [carousel, setCarousel] = useState(0);
   const [autoScroll, setAutoScroll] = useState(true)
   const [scroll, setScroll] = useState('')
   const [width, setWidth] = useState(0)
+  const [slideState, setSlideState] = useState("login")
+  const [loginSuccess, setLoginSuccess] = useState("")
   const body = useRef(null)
+  const slide = useRef(null)
+  const myaccount = useRef(null)
+  const isLoggedIn = useSelector(state => state.isLoggedIn.value)
+  const email = useSelector(state => state.email.value)
+  const userName = useSelector(state => state.userName.value)
+  const password = useSelector(state => state.password.value)
+  const dispatch = useDispatch()
+
+  // functions
   const leftFirstClick = () => {
     if (firstProduct > 0) {
       setFirstProduct((pre) => pre - 1);
@@ -80,13 +100,11 @@ function App() {
   const rightFirstClick = () => {
     if (firstProduct < 5) {
       setFirstProduct((pre) => pre + 1);
-      console.log(secondProduct);
     }
   };
   const rightSecondClick = () => {
     if (secondProduct < 4) {
       setSecondProduct((pre) => pre + 1);
-      console.log(secondProduct);
     }
   };
   const leftCarousel = () => {
@@ -103,17 +121,81 @@ function App() {
       setCarousel(0);
     }
   };
+  const handleLogin = (event) => {
+    event.preventDefault()
+    setLoginSuccess("")
+    let data = {
+      email_id:email,
+      password:password
+    }
+    axios
+      .post("http://localhost:5000/login", data)
+      .then(function (response) {
+        console.log(response);
+        if (response.data.Item) {
+          dispatch(updateIsLoggedIn())
+          dispatch(updateUserName(response.data.Item.username));
+          slide.current.style.transform = "translateX(600px)";
+        }
+        else {
+          setLoginSuccess(response.data.message)
+          dispatch(updateEmail(""))
+          dispatch(updatePassword(""))
+        }
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
+
+  const handleSignup = (e) => {
+    e.preventDefault()
+    setLoginSuccess("");
+    let data = {
+      username: userName,
+      email_id: email,
+      password: password,
+    };
+    axios
+      .post("http://localhost:5000/signup", data)
+      .then(function (response) {
+        console.log(response);
+        if (response.data.message) {
+          setLoginSuccess(response.data.message);
+          dispatch(updateEmail(""));
+          dispatch(updatePassword(""));
+          dispatch(updateUserName(""))
+        } else {
+          dispatch(updateIsLoggedIn());
+          slide.current.style.transform = "translateX(600px)";
+        }
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
+
+  const handleLogout = () => {
+    myaccount.current.style.transform = "translateX(600px)";
+    dispatch(updateIsLoggedIn());
+    dispatch(updateEmail(""));
+    dispatch(updatePassword(""));
+    dispatch(updateUserName(""));
+  }
+
+
   const ctitle = ["Aesop K11 Musea", "Aesop New Town Plaza", 'Aesop Hollywood Road'];
   useEffect(() => {
     setWidth(window.innerWidth)
   }, [])
   useEffect(() => {
-    console.log(autoScroll)
     if(autoScroll){
       var interval = setInterval(() => setCarousel(pre=>(pre+1)%3), 4000);
     }
       return ()=>clearInterval(interval)
   }, [autoScroll])
+
+
   return (
     <StyledApp
       ref={body}
@@ -125,6 +207,158 @@ function App() {
         }
       }}
     >
+      <StyledSlide ref={myaccount}>
+        <h6
+          onClick={() => {
+            myaccount.current.style.transform = "translateX(600px)";
+          }}
+          style={{ margin: "0px 0px 0px -100px", fontSize: "1.5rem" }}
+        >
+          <AiOutlineArrowRight />
+        </h6>
+        <h3>My Account</h3>
+        <h6>Username:{userName}</h6>
+        <h6>Email:{email}</h6>
+        <button
+          style={{
+            padding: "10px 30px",
+            backgroundColor: "#b8d0cb",
+            width: "fit-content",
+            border: "none",
+            fontWeight: "900",
+            color: "#fff",
+          }}
+          onClick={() => handleLogout()}
+        >Logout</button>
+      </StyledSlide>
+      <StyledSlide ref={slide}>
+        {slideState === "login" ? (
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <h6
+              onClick={() => {
+                slide.current.style.transform = "translateX(600px)";
+              }}
+              style={{ marginLeft: "-100px", fontSize: "1.5rem" }}
+            >
+              <AiOutlineArrowRight />
+            </h6>
+            <h3>Login</h3>
+            <br />
+            <div style={{ color: "red" }}>{loginSuccess}</div>
+            <form
+              onSubmit={(event) => handleLogin(event)}
+              style={{ display: "flex", flexDirection: "column" }}
+            >
+              <label htmlFor="email_input">Enter email</label>
+              <input
+                id="email_input"
+                type="text"
+                name="email"
+                value={email}
+                placeholder="email"
+                onChange={(e) => dispatch(updateEmail(e.target.value))}
+                required
+              />
+              <br />
+              <label htmlFor="password_input">Enter password</label>
+              <input
+                id="password_input"
+                type="password"
+                name="password"
+                value={password}
+                placeholder="password"
+                onChange={(e) => dispatch(updatePassword(e.target.value))}
+                required
+              />
+              <br />
+              <button
+                type="submit"
+                style={{
+                  padding: "10px 30px",
+                  backgroundColor: "#b8d0cb",
+                  width: "fit-content",
+                  border: "none",
+                  fontWeight: "900",
+                  color: "#fff",
+                }}
+              >
+                Login
+              </button>
+            </form>
+            <div onClick={() => setSlideState("register")}>
+              Not an user? Register here
+            </div>
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <h6
+              onClick={() => {
+                slide.current.style.transform = "translateX(600px)";
+              }}
+              style={{ marginLeft: "-100px", fontSize: "1.5rem" }}
+            >
+              <AiOutlineArrowRight />
+            </h6>
+            <h3>Register</h3>
+            <br />
+            <div style={{ color: "red" }}>{loginSuccess}</div>
+            <form
+              onSubmit={(event) => handleSignup(event)}
+              style={{ display: "flex", flexDirection: "column" }}
+            >
+              <label htmlFor="name_input">Enter name</label>
+              <input
+                id="name_input"
+                type="text"
+                name="name"
+                onChange={(e) => dispatch(updateUserName(e.target.value))}
+                value={userName}
+                placeholder="name"
+                required
+              />
+              <br />
+              <label htmlFor="email_input">Enter email</label>
+              <input
+                id="email_input"
+                type="text"
+                name="email"
+                onChange={(e) => dispatch(updateEmail(e.target.value))}
+                value={email}
+                placeholder="email"
+                required
+              />
+              <br />
+              <label htmlFor="password_input">Enter password</label>
+              <input
+                id="password_input"
+                type="password"
+                onChange={(e) => dispatch(updatePassword(e.target.value))}
+                value={password}
+                name="password"
+                placeholder="password"
+                required
+              />
+              <br />
+              <button
+                type="submit"
+                style={{
+                  padding: "10px 30px",
+                  backgroundColor: "#b8d0cb",
+                  width: "fit-content",
+                  border: "none",
+                  fontWeight: "900",
+                  color: "#fff",
+                }}
+              >
+                Signup
+              </button>
+            </form>
+            <div onClick={() => setSlideState("login")}>
+              Already an user? Login here
+            </div>
+          </div>
+        )}
+      </StyledSlide>
       <StyledTopbar padding>
         <StyledTopbar>
           <StyledTopbar hover>
@@ -172,7 +406,25 @@ function App() {
             <StyledNavLink>Search</StyledNavLink>
           </StyledNavDiv>
           <StyledNavDiv>
-            <StyledNavLink left>Login</StyledNavLink>
+            {isLoggedIn ? (
+              <StyledNavLink
+                onClick={() => {
+                  myaccount.current.style.transform = "translateX(0px)"
+                }}
+              >
+                <RiAccountCircleFill style={{ fontSize: "1.3rem" }} />
+                My Account
+              </StyledNavLink>
+            ) : (
+              <StyledNavLink
+                onClick={() => {
+                  slide.current.style.transform = "translateX(0px)";
+                }}
+                left
+              >
+                Login
+              </StyledNavLink>
+            )}
             <StyledNavLink left>Cart</StyledNavLink>
           </StyledNavDiv>
         </StyledNav>
