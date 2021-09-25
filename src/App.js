@@ -129,18 +129,20 @@ function App() {
       password:password
     }
     axios
-      .post("http://localhost:5000/login", data)
+      .post(
+        "http://ec2-13-232-120-51.ap-south-1.compute.amazonaws.com//login",
+        data
+      )
       .then(function (response) {
         console.log(response);
         if (response.data.Item) {
-          dispatch(updateIsLoggedIn())
+          dispatch(updateIsLoggedIn());
           dispatch(updateUserName(response.data.Item.username));
           slide.current.style.transform = "translateX(600px)";
-        }
-        else {
-          setLoginSuccess(response.data.message)
-          dispatch(updateEmail(""))
-          dispatch(updatePassword(""))
+        } else {
+          setLoginSuccess(response.data.message);
+          dispatch(updateEmail(""));
+          dispatch(updatePassword(""));
         }
       })
       .catch(function (error) {
@@ -157,14 +159,17 @@ function App() {
       password: password,
     };
     axios
-      .post("http://localhost:5000/signup", data)
+      .post(
+        "http://ec2-13-232-120-51.ap-south-1.compute.amazonaws.com//signup",
+        data
+      )
       .then(function (response) {
         console.log(response);
         if (response.data.message) {
           setLoginSuccess(response.data.message);
           dispatch(updateEmail(""));
           dispatch(updatePassword(""));
-          dispatch(updateUserName(""))
+          dispatch(updateUserName(""));
         } else {
           dispatch(updateIsLoggedIn());
           slide.current.style.transform = "translateX(600px)";
