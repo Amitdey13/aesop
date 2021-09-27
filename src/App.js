@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, Suspense, useEffect, useRef } from "react";
 import "./index.css";
 import {
   StyledApp,
@@ -66,6 +66,8 @@ import {updateEmail} from "./features/email/emailSlice"
 import {updatePassword} from "./features/password/passwordSlice"
 import { updateUserName } from "./features/userName/userNameSlice"
 import axios from "axios";
+import { updateProfile } from "./features/profileImage/profileImageSlice";
+
 
 function App() {
   // values
@@ -84,7 +86,10 @@ function App() {
   const email = useSelector(state => state.email.value)
   const userName = useSelector(state => state.userName.value)
   const password = useSelector(state => state.password.value)
+  const profileImage = useSelector(state => state.profile.value)
+  const [profile, setProfile] = useState()
   const dispatch = useDispatch()
+  const edit = useRef(null);
 
   // functions
   const leftFirstClick = () => {
@@ -129,10 +134,7 @@ function App() {
       password:password
     }
     axios
-      .post(
-        "http://ec2-13-232-120-51.ap-south-1.compute.amazonaws.com//login",
-        data
-      )
+      .post("http://ec2-13-232-120-51.ap-south-1.compute.amazonaws.com/login", data)
       .then(function (response) {
         console.log(response);
         if (response.data.Item) {
@@ -159,10 +161,7 @@ function App() {
       password: password,
     };
     axios
-      .post(
-        "http://ec2-13-232-120-51.ap-south-1.compute.amazonaws.com//signup",
-        data
-      )
+      .post("http://ec2-13-232-120-51.ap-south-1.compute.amazonaws.com/signup", data)
       .then(function (response) {
         console.log(response);
         if (response.data.message) {
@@ -172,6 +171,7 @@ function App() {
           dispatch(updateUserName(""));
         } else {
           dispatch(updateIsLoggedIn());
+          dispatch(updateProfile(profileImage));
           slide.current.style.transform = "translateX(600px)";
         }
       })
@@ -180,12 +180,41 @@ function App() {
       });
   }
 
+  const imageHandler = (e) => {
+    const data = new FormData();
+    data.append("profile", e.target.files[0]);
+    setProfile(e.target.files)
+  }
+
   const handleLogout = () => {
     myaccount.current.style.transform = "translateX(600px)";
     dispatch(updateIsLoggedIn());
     dispatch(updateEmail(""));
     dispatch(updatePassword(""));
     dispatch(updateUserName(""));
+  }
+
+  const editImage = () => {
+    myaccount.current.style.transform = "translateX(600px)";
+    edit.current.style.transform = "translateX(0px)";
+  }
+
+  const uploadImageHandler = (e) => {
+    e.preventDefault();
+    edit.current.style.transform = "translateX(600px)";
+    myaccount.current.style.transform = "translateX(0px)";
+    const data = new FormData();
+    console.log(profile);
+    data.append("file", profile[0]);
+    axios.post("http://ec2-13-232-120-51.ap-south-1.compute.amazonaws.com/upload", data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      }
+    })
+      .then(res => {
+        dispatch(updateProfile(res.data.Location))
+      })
+    .catch(err=>console.log(err))
   }
 
 
@@ -212,6 +241,49 @@ function App() {
         }
       }}
     >
+      <StyledSlide ref={edit}>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <h6
+            onClick={() => {
+              slide.current.style.transform = "translateX(600px)";
+            }}
+            style={{ marginLeft: "-100px", fontSize: "1.5rem" }}
+          >
+            <AiOutlineArrowRight />
+          </h6>
+          <h3>Edit Image</h3>
+          <br />
+          <form
+            // onSubmit={(event) => handleLogin(event)}
+            style={{ display: "flex", flexDirection: "column" }}
+          >
+            <br />
+            <label htmlFor="password_input">Enter password</label>
+            <input
+              id="image_input"
+              type="file"
+              name="profile"
+              onChange={(e)=>imageHandler(e)}
+              required
+            />
+            <br />
+            <button
+              type="submit"
+              style={{
+                padding: "10px 30px",
+                backgroundColor: "#b8d0cb",
+                width: "fit-content",
+                border: "none",
+                fontWeight: "900",
+                color: "#fff",
+              }}
+              onClick={(e)=>uploadImageHandler(e)}
+            >
+              Save Changes
+            </button>
+          </form>
+        </div>
+      </StyledSlide>
       <StyledSlide ref={myaccount}>
         <h6
           onClick={() => {
@@ -222,6 +294,26 @@ function App() {
           <AiOutlineArrowRight />
         </h6>
         <h3>My Account</h3>
+        <div>
+          <img
+            style={{ height: "100px", width: "100px" }}
+            src={profileImage}
+            alt="gravatar"
+          />
+        </div>
+        <button
+          style={{
+            padding: "5px 10px",
+            backgroundColor: "#b8d0cb",
+            width: "fit-content",
+            border: "none",
+            fontWeight: "900",
+            color: "#fff",
+          }}
+          onClick={(e) => editImage(e)}
+        >
+          edit
+        </button>
         <h6>Username:{userName}</h6>
         <h6>Email:{email}</h6>
         <button
@@ -234,7 +326,9 @@ function App() {
             color: "#fff",
           }}
           onClick={() => handleLogout()}
-        >Logout</button>
+        >
+          Logout
+        </button>
       </StyledSlide>
       <StyledSlide ref={slide}>
         {slideState === "login" ? (
@@ -414,7 +508,7 @@ function App() {
             {isLoggedIn ? (
               <StyledNavLink
                 onClick={() => {
-                  myaccount.current.style.transform = "translateX(0px)"
+                  myaccount.current.style.transform = "translateX(0px)";
                 }}
               >
                 <RiAccountCircleFill style={{ fontSize: "1.3rem" }} />
