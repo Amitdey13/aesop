@@ -21,12 +21,13 @@ export const StyledList = styled.div`
   display: flex;
   height: 100vh;
   width: 300px;
-  padding: 50px 50px;
+  padding: 0px 50px;
   background-color: #fff;
   position: fixed;
   z-index: 1000;
   flex-direction: column;
   top: 0;
+  overflow:scroll;
   transform: translateX(-600px);
   transition: ease-in-out 0.5s;
 `;

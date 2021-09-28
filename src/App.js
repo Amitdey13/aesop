@@ -69,6 +69,58 @@ import { updateUserName } from "./features/userName/userNameSlice"
 import axios from "axios";
 import { updateProfile } from "./features/profileImage/profileImageSlice";
 
+function People({ userName, profileImage }) {
+  const [btn, setBtn] = useState("Add friend")
+  return (
+    <div style={{ display: "flex", alignItems:"flex-end", padding: "10px 0px 10px 0px" }}>
+      <img
+        style={{ height: "50px", marginRight:"10px", width: "50px" }}
+        src={profileImage}
+        alt="profile"
+      />
+      <div style={{ display: "flex", flexDirection:"column" }}>
+        <h5>{userName}</h5>
+        <button
+          style={{
+            padding: "5px 10px",
+            backgroundColor: "#b8d0cb",
+            width: "fit-content",
+            border: "none",
+            fontWeight: "600",
+            color: "#fff",
+          }}
+          onClick={() => {
+            setBtn("Remove friend")
+          }}
+        >
+          {btn}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function Friend({ userName, profileImage }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "flex-end",
+        padding: "10px 0px 10px 0px",
+      }}
+    >
+      <img
+        style={{ height: "50px", marginRight: "10px", width: "50px" }}
+        src={profileImage}
+        alt="profile"
+      />
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <h5>{userName}</h5>
+      </div>
+    </div>
+  );
+}
+
 
 function App() {
   // values
@@ -93,6 +145,8 @@ function App() {
   const friendList = useRef(null)
   const search = useRef(null)
   const edit = useRef(null);
+  const [ users, setUsers] = useState([])
+  const [ friends, setFriends] = useState([])
 
   // functions
   const leftFirstClick = () => {
@@ -137,10 +191,7 @@ function App() {
       password:password
     }
     axios
-      .post(
-        "http://ec2-13-232-120-51.ap-south-1.compute.amazonaws.com/login",
-        data
-      )
+      .post("http://ec2-13-232-120-51.ap-south-1.compute.amazonaws.com/login", data)
       .then(function (response) {
         console.log(response);
         if (response.data.Item) {
@@ -215,15 +266,11 @@ function App() {
     data.append("email_id", email)
     // http://ec2-13-232-120-51.ap-south-1.compute.amazonaws.com/upload
     axios
-      .post(
-        "http://ec2-13-232-120-51.ap-south-1.compute.amazonaws.com/upload",
-        data,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      )
+      .post("http://ec2-13-232-120-51.ap-south-1.compute.amazonaws.com/upload", data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
       .then((res) => {
         dispatch(updateProfile(res.data.Location));
       })
@@ -231,11 +278,25 @@ function App() {
   }
 
   const searchList = () => {
+    axios.get("http://ec2-13-232-120-51.ap-south-1.compute.amazonaws.com/peoples")
+      .then(res => {
+        if (users.length===0)
+          setUsers(pre=>[...pre, ...res.data])
+    })
+    .catch(err=>console.log(err))
     search.current.style.transform = "translateX(0px)"
-    axios.get("http://localhost:5000/peoples")
-    
+      
   }
   const friendListSlide = () => {
+    let data = {
+      email_id:email
+    }
+    axios.get(`http://ec2-13-232-120-51.ap-south-1.compute.amazonaws.com/friends?email_id=${email}`)
+      .then(res => {
+        if (friends.length===0)
+          setFriends(pre=>[...pre, ...res.data[0].friends])
+      })
+    .catch(err=>console.log(err))
     friendList.current.style.transform = "translateX(0px)"
   }
 
@@ -521,30 +582,49 @@ function App() {
           }}
         >
           <StyledList ref={search}>
-            <ImCross
-              onClick={() => {
-                search.current.style.transform = "translateX(-600px)";
-              }}
-            />
-            <br />
-            <div>Peoples</div>
-            <hr />
+            <div>
+              <ImCross
+                onClick={() => {
+                  search.current.style.transform = "translateX(-600px)";
+                }}
+              />
+              {users.map((user, index) => {
+                return(user.email_id!==email?
+                    <People
+                      key={index}
+                      userName={user.username}
+                      profileImage={user.profile}
+                    />:null)
+              })}
+            </div>
           </StyledList>
           <StyledList ref={friendList}>
-            <ImCross
-              onClick={() => {
-                friendList.current.style.transform = "translateX(-600px)";
-              }}
-            />
-            <br />
-            <div>Friends</div>
-            <hr />
+            <div>
+              <ImCross
+                onClick={() => {
+                  friendList.current.style.transform = "translateX(-600px)";
+                }}
+              />
+              {friends.map((user, index) => (
+                <Friend
+                  key={index}
+                  userName={user[0]}
+                  profileImage={user[1]}
+                />
+              ))}
+            </div>
           </StyledList>
           <StyledNavDiv>
-            <StyledNavLink onClick={() => friendListSlide()}>
-              Friend list
-            </StyledNavLink>
-            <StyledNavLink onClick={() => searchList()}>Peoples</StyledNavLink>
+            {isLoggedIn ? (
+              <StyledNavLink onClick={() => friendListSlide()}>
+                Friend list
+              </StyledNavLink>
+            ) : null}
+            {isLoggedIn ? (
+              <StyledNavLink onClick={() => searchList()}>
+                Peoples
+              </StyledNavLink>
+            ) : null}
             <StyledNavLink>Search</StyledNavLink>
           </StyledNavDiv>
           <StyledNavDiv>
