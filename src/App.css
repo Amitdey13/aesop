@@ -1,0 +1,12 @@
+.btn{
+    cursor: pointer;
+}
+.btn:hover{
+    background-color: #000 !important;
+}
+.redirect{
+    cursor: pointer;
+}
+.redirect:hover{
+    color:blue;
+}

@@ -29,7 +29,8 @@ import {
   StyledFootercardhead,
   StyledFootercardtext,
   StyledSlide,
-  StyledList
+  StyledList,
+  Styledbtn
 } from "./styledComponents";
 import {useSelector, useDispatch} from "react-redux"
 import { AiOutlineArrowRight } from "react-icons/ai";
@@ -68,19 +69,27 @@ import {updatePassword} from "./features/password/passwordSlice"
 import { updateUserName } from "./features/userName/userNameSlice"
 import axios from "axios";
 import { updateProfile } from "./features/profileImage/profileImageSlice";
+import "./App.css"
 
 function People({ userName, profileImage }) {
   const [btn, setBtn] = useState("Add friend")
   return (
-    <div style={{ display: "flex", alignItems:"flex-end", padding: "10px 0px 10px 0px" }}>
+    <div
+      style={{
+        display: "flex",
+        alignItems: "flex-end",
+        padding: "10px 0px 10px 0px",
+      }}
+    >
       <img
-        style={{ height: "50px", marginRight:"10px", width: "50px" }}
+        style={{ height: "50px", marginRight: "10px", width: "50px" }}
         src={profileImage}
         alt="profile"
       />
-      <div style={{ display: "flex", flexDirection:"column" }}>
+      <div style={{ display: "flex", flexDirection: "column" }}>
         <h5>{userName}</h5>
         <button
+          className="btn"
           style={{
             padding: "5px 10px",
             backgroundColor: "#b8d0cb",
@@ -88,9 +97,10 @@ function People({ userName, profileImage }) {
             border: "none",
             fontWeight: "600",
             color: "#fff",
+            cursor:"pointer"
           }}
           onClick={() => {
-            setBtn("Remove friend")
+            setBtn("Remove friend");
           }}
         >
           {btn}
@@ -106,7 +116,7 @@ function Friend({ userName, profileImage }) {
       style={{
         display: "flex",
         alignItems: "flex-end",
-        padding: "10px 0px 10px 0px",
+        padding: "10px 0px 10px 0px"
       }}
     >
       <img
@@ -360,6 +370,7 @@ function App() {
                 fontWeight: "900",
                 color: "#fff",
               }}
+              className="btn"
               onClick={(e) => uploadImageHandler(e)}
             >
               Save Changes
@@ -393,6 +404,7 @@ function App() {
             fontWeight: "900",
             color: "#fff",
           }}
+          className="btn"
           onClick={(e) => editImage(e)}
         >
           edit
@@ -408,6 +420,7 @@ function App() {
             fontWeight: "900",
             color: "#fff",
           }}
+          className="btn"
           onClick={() => handleLogout()}
         >
           Logout
@@ -463,11 +476,12 @@ function App() {
                   fontWeight: "900",
                   color: "#fff",
                 }}
+                className="btn"
               >
                 Login
               </button>
             </form>
-            <div onClick={() => setSlideState("register")}>
+            <div className="redirect" onClick={() => setSlideState("register")}>
               Not an user? Register here
             </div>
           </div>
@@ -523,6 +537,7 @@ function App() {
               <br />
               <button
                 type="submit"
+                className="btn"
                 style={{
                   padding: "10px 30px",
                   backgroundColor: "#b8d0cb",
@@ -535,7 +550,7 @@ function App() {
                 Signup
               </button>
             </form>
-            <div onClick={() => setSlideState("login")}>
+            <div className="redirect" onClick={() => setSlideState("login")}>
               Already an user? Login here
             </div>
           </div>
@@ -589,12 +604,13 @@ function App() {
                 }}
               />
               {users.map((user, index) => {
-                return(user.email_id!==email?
-                    <People
-                      key={index}
-                      userName={user.username}
-                      profileImage={user.profile}
-                    />:null)
+                return user.email_id !== email ? (
+                  <People
+                    key={index}
+                    userName={user.username}
+                    profileImage={user.profile}
+                  />
+                ) : null;
               })}
             </div>
           </StyledList>
@@ -606,11 +622,7 @@ function App() {
                 }}
               />
               {friends.map((user, index) => (
-                <Friend
-                  key={index}
-                  userName={user[0]}
-                  profileImage={user[1]}
-                />
+                <Friend key={index} userName={user[0]} profileImage={user[1]} />
               ))}
             </div>
           </StyledList>
