@@ -137,7 +137,10 @@ function App() {
       password:password
     }
     axios
-      .post("http://localhost:5000/login", data)
+      .post(
+        "http://ec2-13-232-120-51.ap-south-1.compute.amazonaws.com/login",
+        data
+      )
       .then(function (response) {
         console.log(response);
         if (response.data.Item) {
@@ -212,11 +215,15 @@ function App() {
     data.append("email_id", email)
     // http://ec2-13-232-120-51.ap-south-1.compute.amazonaws.com/upload
     axios
-      .post("http://localhost:5000/upload", data, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
+      .post(
+        "http://ec2-13-232-120-51.ap-south-1.compute.amazonaws.com/upload",
+        data,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      )
       .then((res) => {
         dispatch(updateProfile(res.data.Location));
       })
@@ -226,7 +233,7 @@ function App() {
   const searchList = () => {
     search.current.style.transform = "translateX(0px)"
     axios.get("http://localhost:5000/peoples")
-      
+    
   }
   const friendListSlide = () => {
     friendList.current.style.transform = "translateX(0px)"
