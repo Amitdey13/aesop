@@ -17,6 +17,20 @@ export const StyledSlide = styled.div`
   transition: ease-in-out 0.5s;
 `;
 
+export const StyledList = styled.div`
+  display: flex;
+  height: 100vh;
+  width: 300px;
+  padding: 50px 50px;
+  background-color: #fff;
+  position: fixed;
+  z-index: 1000;
+  flex-direction: column;
+  top: 0;
+  transform: translateX(-600px);
+  transition: ease-in-out 0.5s;
+`;
+
 export const StyledApp = styled.div`
     display: flex;
     flex-direction: column;

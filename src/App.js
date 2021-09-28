@@ -1,4 +1,4 @@
-import React, { useState, Suspense, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./index.css";
 import {
   StyledApp,
@@ -28,11 +28,12 @@ import {
   StyledFootercard2,
   StyledFootercardhead,
   StyledFootercardtext,
-  StyledSlide
+  StyledSlide,
+  StyledList
 } from "./styledComponents";
 import {useSelector, useDispatch} from "react-redux"
 import { AiOutlineArrowRight } from "react-icons/ai";
-import { ImArrowUpRight2 } from "react-icons/im";
+import { ImArrowUpRight2, ImCross } from "react-icons/im";
 import { HiMenuAlt4 } from "react-icons/hi";
 import { RiAccountCircleFill } from "react-icons/ri";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
@@ -89,6 +90,8 @@ function App() {
   const profileImage = useSelector(state => state.profile.value)
   const [profile, setProfile] = useState()
   const dispatch = useDispatch()
+  const friendList = useRef(null)
+  const search = useRef(null)
   const edit = useRef(null);
 
   // functions
@@ -134,7 +137,7 @@ function App() {
       password:password
     }
     axios
-      .post("http://ec2-13-232-120-51.ap-south-1.compute.amazonaws.com/login", data)
+      .post("http://localhost:5000/login", data)
       .then(function (response) {
         console.log(response);
         if (response.data.Item) {
@@ -206,15 +209,27 @@ function App() {
     const data = new FormData();
     console.log(profile);
     data.append("file", profile[0]);
-    axios.post("http://ec2-13-232-120-51.ap-south-1.compute.amazonaws.com/upload", data, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      }
-    })
-      .then(res => {
-        dispatch(updateProfile(res.data.Location))
+    data.append("email_id", email)
+    // http://ec2-13-232-120-51.ap-south-1.compute.amazonaws.com/upload
+    axios
+      .post("http://localhost:5000/upload", data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       })
-    .catch(err=>console.log(err))
+      .then((res) => {
+        dispatch(updateProfile(res.data.Location));
+      })
+      .catch((err) => console.log(err));
+  }
+
+  const searchList = () => {
+    search.current.style.transform = "translateX(0px)"
+    axios.get("http://localhost:5000/peoples")
+      
+  }
+  const friendListSlide = () => {
+    friendList.current.style.transform = "translateX(0px)"
   }
 
 
@@ -263,7 +278,7 @@ function App() {
               id="image_input"
               type="file"
               name="profile"
-              onChange={(e)=>imageHandler(e)}
+              onChange={(e) => imageHandler(e)}
               required
             />
             <br />
@@ -277,7 +292,7 @@ function App() {
                 fontWeight: "900",
                 color: "#fff",
               }}
-              onClick={(e)=>uploadImageHandler(e)}
+              onClick={(e) => uploadImageHandler(e)}
             >
               Save Changes
             </button>
@@ -498,10 +513,31 @@ function App() {
                 : "none",
           }}
         >
+          <StyledList ref={search}>
+            <ImCross
+              onClick={() => {
+                search.current.style.transform = "translateX(-600px)";
+              }}
+            />
+            <br />
+            <div>Peoples</div>
+            <hr />
+          </StyledList>
+          <StyledList ref={friendList}>
+            <ImCross
+              onClick={() => {
+                friendList.current.style.transform = "translateX(-600px)";
+              }}
+            />
+            <br />
+            <div>Friends</div>
+            <hr />
+          </StyledList>
           <StyledNavDiv>
-            <StyledNavLink>Shop</StyledNavLink>
-            <StyledNavLink>Read</StyledNavLink>
-            <StyledNavLink>Stores</StyledNavLink>
+            <StyledNavLink onClick={() => friendListSlide()}>
+              Friend list
+            </StyledNavLink>
+            <StyledNavLink onClick={() => searchList()}>Peoples</StyledNavLink>
             <StyledNavLink>Search</StyledNavLink>
           </StyledNavDiv>
           <StyledNavDiv>

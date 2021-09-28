@@ -10,7 +10,7 @@ export default configureStore({
         isLoggedIn: isLoggedInReducer,
         email: emailReducer,
         userName: userNameReducer,
-    password: passwordReducer,
+        password: passwordReducer,
         profile: profileReducer
   },
 });
