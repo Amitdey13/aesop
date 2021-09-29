@@ -16,18 +16,11 @@ export const StyledSlide = styled.div`
   transition: ease-in-out 0.5s;
 `;
 
-export const Styledbtn = styled.button`
-  cursor:pointer;
-  &:hover {
-    background-color: #000;
-  }
-`;
-
 export const StyledList = styled.div`
   display: flex;
-  height: 100vh;
+  height: 98vh;
   width: 300px;
-  padding: 0px 50px;
+  padding: 50px 2vh 0px 50px;
   background-color: #fff;
   position: fixed;
   z-index: 1000;

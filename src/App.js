@@ -30,7 +30,6 @@ import {
   StyledFootercardtext,
   StyledSlide,
   StyledList,
-  Styledbtn
 } from "./styledComponents";
 import {useSelector, useDispatch} from "react-redux"
 import { AiOutlineArrowRight } from "react-icons/ai";
@@ -70,9 +69,24 @@ import { updateUserName } from "./features/userName/userNameSlice"
 import axios from "axios";
 import { updateProfile } from "./features/profileImage/profileImageSlice";
 import "./App.css"
+const url = "http://ec2-13-232-120-51.ap-south-1.compute.amazonaws.com";
+// const url = "http://localhost:5000";
 
-function People({ userName, profileImage }) {
+function People({my_email_id, friend_email_id, userName, profileImage }) {
   const [btn, setBtn] = useState("Add friend")
+
+  const addFriendHandler = () => {
+    let data = {
+      my_email_id,
+      friend_email_id,
+      friend_username: userName,
+      friend_profile: profileImage
+    }
+    axios.post(`${url}/addfriend`, data)
+      .then(res => setBtn('Remove friend'))
+    .catch(err=>console.log(err))
+  }
+
   return (
     <div
       style={{
@@ -99,9 +113,7 @@ function People({ userName, profileImage }) {
             color: "#fff",
             cursor:"pointer"
           }}
-          onClick={() => {
-            setBtn("Remove friend");
-          }}
+          onClick={() => addFriendHandler()}
         >
           {btn}
         </button>
@@ -158,6 +170,7 @@ function App() {
   const [ users, setUsers] = useState([])
   const [ friends, setFriends] = useState([])
 
+
   // functions
   const leftFirstClick = () => {
     if (firstProduct > 0) {
@@ -201,12 +214,13 @@ function App() {
       password:password
     }
     axios
-      .post("http://ec2-13-232-120-51.ap-south-1.compute.amazonaws.com/login", data)
+      .post(`${url}/login`, data)
       .then(function (response) {
         console.log(response);
         if (response.data.Item) {
           dispatch(updateIsLoggedIn());
           dispatch(updateUserName(response.data.Item.username));
+          dispatch(updateProfile(response.data.Item.profile));
           slide.current.style.transform = "translateX(600px)";
         } else {
           setLoginSuccess(response.data.message);
@@ -228,7 +242,7 @@ function App() {
       password: password,
     };
     axios
-      .post("http://ec2-13-232-120-51.ap-south-1.compute.amazonaws.com/signup", data)
+      .post(`${url}/signup`, data)
       .then(function (response) {
         console.log(response);
         if (response.data.message) {
@@ -274,9 +288,8 @@ function App() {
     console.log(profile);
     data.append("file", profile[0]);
     data.append("email_id", email)
-    // http://ec2-13-232-120-51.ap-south-1.compute.amazonaws.com/upload
     axios
-      .post("http://ec2-13-232-120-51.ap-south-1.compute.amazonaws.com/upload", data, {
+      .post(`${url}/upload`, data, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -288,23 +301,21 @@ function App() {
   }
 
   const searchList = () => {
-    axios.get("http://ec2-13-232-120-51.ap-south-1.compute.amazonaws.com/peoples")
+    axios.get(`${url}/peoples`)
       .then(res => {
-        if (users.length===0)
-          setUsers(pre=>[...pre, ...res.data])
+        if (users.length!==res.data)
+          setUsers(pre=>[...res.data])
     })
     .catch(err=>console.log(err))
     search.current.style.transform = "translateX(0px)"
       
   }
   const friendListSlide = () => {
-    let data = {
-      email_id:email
-    }
-    axios.get(`http://ec2-13-232-120-51.ap-south-1.compute.amazonaws.com/friends?email_id=${email}`)
+    axios.get(`${url}/friends?email_id=${email}`)
       .then(res => {
-        if (friends.length===0)
-          setFriends(pre=>[...pre, ...res.data[0].friends])
+        console.log(res.data);
+        if (friends.length!==res.data.length)
+          setFriends(pre=>[...res.data])
       })
     .catch(err=>console.log(err))
     friendList.current.style.transform = "translateX(0px)"
@@ -607,6 +618,8 @@ function App() {
                 return user.email_id !== email ? (
                   <People
                     key={index}
+                    my_email_id={email}
+                    friend_email_id={user.email_id}
                     userName={user.username}
                     profileImage={user.profile}
                   />
@@ -622,7 +635,7 @@ function App() {
                 }}
               />
               {friends.map((user, index) => (
-                <Friend key={index} userName={user[0]} profileImage={user[1]} />
+                <Friend key={index} userName={user.friend_username} profileImage={user.friend_profile} />
               ))}
             </div>
           </StyledList>
