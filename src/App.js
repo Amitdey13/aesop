@@ -91,7 +91,8 @@ function People({ my_id, friend_id, friend_list, userName, profileImage }) {
   const addFriendHandler = () => {
     let data = {
       userId: my_id,
-      newFriendList: [...friend_list, {UserId:friend_id}]
+      newFriendList: [...friend_list, {UserId:friend_id}],
+      friend_id
     }
     axios.post(`${url}/addfriend`, data)
       .then(res => {
