@@ -68,22 +68,37 @@ import {updatePassword} from "./features/password/passwordSlice"
 import { updateUserName } from "./features/userName/userNameSlice"
 import axios from "axios";
 import { updateProfile } from "./features/profileImage/profileImageSlice";
+import {updateFriendList} from "./features/friendList/friendListSlice"
 import "./App.css"
+import { updateUserId } from "./features/userId/userIdSlice";
+import uniqid from 'uniqid';
 const url = "http://ec2-13-232-120-51.ap-south-1.compute.amazonaws.com";
 // const url = "http://localhost:5000";
 
-function People({my_email_id, friend_email_id, userName, profileImage }) {
+function People({ my_id, friend_id, friend_list, userName, profileImage }) {
+  const dispatch = useDispatch()
   const [btn, setBtn] = useState("Add friend")
+  useEffect(() => {
+    if (friend_list.length > 0) {
+      let results = friend_list.filter(function (friend) {
+        return friend.UserId === friend_id;
+      });
+      if (results.length === 1)
+        setBtn("Remove friend")
+    }
+  }, [])
 
   const addFriendHandler = () => {
     let data = {
-      my_email_id,
-      friend_email_id,
-      friend_username: userName,
-      friend_profile: profileImage
+      userId: my_id,
+      newFriendList: [...friend_list, {UserId:friend_id}]
     }
     axios.post(`${url}/addfriend`, data)
-      .then(res => setBtn('Remove friend'))
+      .then(res => {
+        setBtn('Remove friend')
+        console.log(res.data);
+        dispatch(updateFriendList(res.data.Attributes.FriendList));
+      })
     .catch(err=>console.log(err))
   }
 
@@ -160,8 +175,10 @@ function App() {
   const isLoggedIn = useSelector(state => state.isLoggedIn.value)
   const email = useSelector(state => state.email.value)
   const userName = useSelector(state => state.userName.value)
+  const userId = useSelector(state => state.userId.value)
   const password = useSelector(state => state.password.value)
   const profileImage = useSelector(state => state.profile.value)
+  const FriendList = useSelector(state => state.friendList.value)
   const [profile, setProfile] = useState()
   const dispatch = useDispatch()
   const friendList = useRef(null)
@@ -217,10 +234,13 @@ function App() {
       .post(`${url}/login`, data)
       .then(function (response) {
         console.log(response);
-        if (response.data.Item) {
+        if (response.data.Items[0]) {
           dispatch(updateIsLoggedIn());
-          dispatch(updateUserName(response.data.Item.username));
-          dispatch(updateProfile(response.data.Item.profile));
+          dispatch(updateUserName(response.data.Items[0].UserName));
+          dispatch(updateProfile(response.data.Items[0].ProfileImageURL));
+          dispatch(updatePassword(""))
+          dispatch(updateFriendList(response.data.Items[0].FriendList))
+          dispatch(updateUserId(response.data.Items[0].UserId))
           slide.current.style.transform = "translateX(600px)";
         } else {
           setLoginSuccess(response.data.message);
@@ -237,9 +257,10 @@ function App() {
     e.preventDefault()
     setLoginSuccess("");
     let data = {
+      userId: uniqid(),
       username: userName,
       email_id: email,
-      password: password,
+      password: password
     };
     axios
       .post(`${url}/signup`, data)
@@ -250,8 +271,10 @@ function App() {
           dispatch(updateEmail(""));
           dispatch(updatePassword(""));
           dispatch(updateUserName(""));
+          dispatch(updateUserId(""));
         } else {
           dispatch(updateIsLoggedIn());
+          dispatch(updateUserId(data.userId));
           dispatch(updateProfile(profileImage));
           slide.current.style.transform = "translateX(600px)";
         }
@@ -273,6 +296,9 @@ function App() {
     dispatch(updateEmail(""));
     dispatch(updatePassword(""));
     dispatch(updateUserName(""));
+    dispatch(updateUserId(""))
+    dispatch(updateProfile(""))
+    dispatch(updateFriendList([]))
   }
 
   const editImage = () => {
@@ -287,7 +313,7 @@ function App() {
     const data = new FormData();
     console.log(profile);
     data.append("file", profile[0]);
-    data.append("email_id", email)
+    data.append("UserId", userId)
     axios
       .post(`${url}/upload`, data, {
         headers: {
@@ -311,7 +337,10 @@ function App() {
       
   }
   const friendListSlide = () => {
-    axios.get(`${url}/friends?email_id=${email}`)
+    let data = {
+      friendList:[...FriendList]
+    }
+    axios.post(`${url}/friends`, data)
       .then(res => {
         console.log(res.data);
         if (friends.length!==res.data.length)
@@ -615,13 +644,14 @@ function App() {
                 }}
               />
               {users.map((user, index) => {
-                return user.email_id !== email ? (
+                return user.Email !== email ? (
                   <People
                     key={index}
-                    my_email_id={email}
-                    friend_email_id={user.email_id}
-                    userName={user.username}
-                    profileImage={user.profile}
+                    my_id={userId}
+                    friend_id={user.UserId}
+                    friend_list = {FriendList}
+                    userName={user.UserName}
+                    profileImage={user.ProfileImageURL}
                   />
                 ) : null;
               })}
@@ -635,7 +665,7 @@ function App() {
                 }}
               />
               {friends.map((user, index) => (
-                <Friend key={index} userName={user.friend_username} profileImage={user.friend_profile} />
+                <Friend key={index} userName={user.UserName} profileImage={user.ProfileImageURL} />
               ))}
             </div>
           </StyledList>
