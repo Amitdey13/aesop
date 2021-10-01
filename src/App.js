@@ -293,6 +293,8 @@ function App() {
 
   const handleLogout = () => {
     myaccount.current.style.transform = "translateX(600px)";
+    search.current.style.transform = "translateX(-600px)";
+    friendList.current.style.transform = "translateX(-600px)";
     dispatch(updateIsLoggedIn());
     dispatch(updateEmail(""));
     dispatch(updatePassword(""));
