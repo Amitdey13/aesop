@@ -7,6 +7,7 @@ import profileReducer from "./features/profileImage/profileImageSlice";
 import friendListReducer from "./features/friendList/friendListSlice";
 import userIdSliceReducer from "./features/userId/userIdSlice";
 import photoSliceReducer from "./features/photos/photoSlice";
+import modalIndexSliceReducer from "./features/modalIndex/modalIndexSlice"
 
 export default configureStore({
   reducer: {
@@ -18,5 +19,6 @@ export default configureStore({
     friendList: friendListReducer,
     userId: userIdSliceReducer,
     photos: photoSliceReducer,
+    modalIndex: modalIndexSliceReducer,
   },
 });

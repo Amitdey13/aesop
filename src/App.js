@@ -69,6 +69,7 @@ import { updateIsLoggedIn } from "./features/isLoggedIn/isLoggedInSlice";
 import { updatePhotos } from "./features/photos/photoSlice";
 import { updatePassword } from "./features/password/passwordSlice";
 import { updateUserName } from "./features/userName/userNameSlice";
+import { updateModalIndex } from "./features/modalIndex/modalIndexSlice";
 import axios from "axios";
 import { updateProfile } from "./features/profileImage/profileImageSlice";
 import { updateFriendList } from "./features/friendList/friendListSlice";
@@ -162,21 +163,35 @@ function Friend({ userName, profileImage }) {
   );
 }
 
-function Modal({ currentIndex, close, photoList }) {
-  const [index, setIndex] = useState(0)
+function Modal({close}) {
   const photos = useSelector((state) => state.photos.value);
+  const index = useSelector((state) => state.modalIndex.value);
+  const dispatch = useDispatch()
+
+  const next = () => {
+    if (index === photos.length)
+      dispatch(updateModalIndex(0))
+    else
+      dispatch(updateModalIndex(index+1))
+  }
+  const pre = () => {
+    if (index === 0)
+      dispatch(updateModalIndex(photos.length - 1))
+    else
+      dispatch(updateModalIndex(index - 1));
+  };
 
   return (
     <div className="Modal">
       <ImCross style={{ right: "0", color: "#fff" }} onClick={() => close()} />
       <div className="ModalContent">
-        <IoIosArrowBack style={{ top: "50%" }} />
+        <IoIosArrowBack onClick={()=>pre()} style={{ top: "50%" }} />
         <img
           style={{ height: "500px", width: "600px" }}
           src={photos[index]}
           alt="gallery"
         />
-        <IoIosArrowForward style={{ top: "50%" }} />
+        <IoIosArrowForward onClick={()=>next()} style={{ top: "50%" }} />
       </div>
     </div>
   );
@@ -213,7 +228,6 @@ function App() {
   const [users, setUsers] = useState([]);
   const [friends, setFriends] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
 
   // functions
   const leftFirstClick = () => {
@@ -413,7 +427,7 @@ function App() {
   };
 
   const openModal = (index) => {
-    setCurrentIndex(index)
+    dispatch(updateModalIndex(index))
     setIsModalOpen(true)
   }
 
@@ -480,7 +494,6 @@ function App() {
       {isModalOpen ? (
         <Modal
           photoList={photos}
-          index={currentIndex}
           close={() => setIsModalOpen(false)}
         />
       ) : null}
