@@ -30,11 +30,13 @@ import {
   StyledFootercardtext,
   StyledSlide,
   StyledList,
+  StyledTab,
 } from "./styledComponents";
-import {useSelector, useDispatch} from "react-redux"
+import { useSelector, useDispatch } from "react-redux";
 import { AiOutlineArrowRight } from "react-icons/ai";
 import { ImArrowUpRight2, ImCross } from "react-icons/im";
 import { HiMenuAlt4 } from "react-icons/hi";
+// import { MdNotifications, MdNotificationsActive } from "react-icons/md";
 import { RiAccountCircleFill } from "react-icons/ri";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import cleansing from "./cleansing.webp";
@@ -62,46 +64,47 @@ import p12 from "./img/p12.webp";
 import p13 from "./img/p13.webp";
 import p14 from "./img/p14.webp";
 import p15 from "./img/p15.webp";
-import {updateIsLoggedIn} from "./features/isLoggedIn/isLoggedInSlice"
-import {updateEmail} from "./features/email/emailSlice"
-import {updatePassword} from "./features/password/passwordSlice"
-import { updateUserName } from "./features/userName/userNameSlice"
+import { updateEmail } from "./features/email/emailSlice";
+import { updateIsLoggedIn } from "./features/isLoggedIn/isLoggedInSlice";
+import { updatePhotos } from "./features/photos/photoSlice";
+import { updatePassword } from "./features/password/passwordSlice";
+import { updateUserName } from "./features/userName/userNameSlice";
 import axios from "axios";
 import { updateProfile } from "./features/profileImage/profileImageSlice";
-import {updateFriendList} from "./features/friendList/friendListSlice"
-import "./App.css"
+import { updateFriendList } from "./features/friendList/friendListSlice";
+import "./App.css";
 import { updateUserId } from "./features/userId/userIdSlice";
-import uniqid from 'uniqid';
+import uniqid from "uniqid";
 const url = "http://ec2-13-232-120-51.ap-south-1.compute.amazonaws.com";
 // const url = "http://localhost:5000";
 
 function People({ my_id, friend_id, friend_list, userName, profileImage }) {
-  const dispatch = useDispatch()
-  const [btn, setBtn] = useState("Add friend")
+  const dispatch = useDispatch();
+  const [btn, setBtn] = useState("Add friend");
   useEffect(() => {
     if (friend_list.length > 0) {
       let results = friend_list.filter(function (friend) {
         return friend.UserId === friend_id;
       });
-      if (results.length === 1)
-        setBtn("Remove friend")
+      if (results.length === 1) setBtn("Remove friend");
     }
-  }, [])
+  }, []);
 
   const addFriendHandler = () => {
     let data = {
       userId: my_id,
-      newFriendList: [...friend_list, {UserId:friend_id}],
-      friend_id
-    }
-    axios.post(`${url}/addfriend`, data)
-      .then(res => {
-        setBtn('Remove friend')
+      newFriendList: [...friend_list, { UserId: friend_id }],
+      friend_id,
+    };
+    axios
+      .post(`${url}/addfriend`, data)
+      .then((res) => {
+        setBtn("Remove friend");
         console.log(res.data);
         dispatch(updateFriendList(res.data.Attributes.FriendList));
       })
-    .catch(err=>console.log(err))
-  }
+      .catch((err) => console.log(err));
+  };
 
   return (
     <div
@@ -127,7 +130,7 @@ function People({ my_id, friend_id, friend_list, userName, profileImage }) {
             border: "none",
             fontWeight: "600",
             color: "#fff",
-            cursor:"pointer"
+            cursor: "pointer",
           }}
           onClick={() => addFriendHandler()}
         >
@@ -144,7 +147,7 @@ function Friend({ userName, profileImage }) {
       style={{
         display: "flex",
         alignItems: "flex-end",
-        padding: "10px 0px 10px 0px"
+        padding: "10px 0px 10px 0px",
       }}
     >
       <img
@@ -159,35 +162,58 @@ function Friend({ userName, profileImage }) {
   );
 }
 
+function Modal({ currentIndex, close, photoList }) {
+  const [index, setIndex] = useState(0)
+  const photos = useSelector((state) => state.photos.value);
+
+  return (
+    <div className="Modal">
+      <ImCross style={{ right: "0", color: "#fff" }} onClick={() => close()} />
+      <div className="ModalContent">
+        <IoIosArrowBack style={{ top: "50%" }} />
+        <img
+          style={{ height: "500px", width: "600px" }}
+          src={photos[index]}
+          alt="gallery"
+        />
+        <IoIosArrowForward style={{ top: "50%" }} />
+      </div>
+    </div>
+  );
+}
 
 function App() {
   // values
   const [firstProduct, setFirstProduct] = useState(0);
   const [secondProduct, setSecondProduct] = useState(0);
   const [carousel, setCarousel] = useState(0);
-  const [autoScroll, setAutoScroll] = useState(true)
-  const [scroll, setScroll] = useState('')
-  const [width, setWidth] = useState(0)
-  const [slideState, setSlideState] = useState("login")
-  const [loginSuccess, setLoginSuccess] = useState("")
-  const body = useRef(null)
-  const slide = useRef(null)
-  const myaccount = useRef(null)
-  const isLoggedIn = useSelector(state => state.isLoggedIn.value)
-  const email = useSelector(state => state.email.value)
-  const userName = useSelector(state => state.userName.value)
-  const userId = useSelector(state => state.userId.value)
-  const password = useSelector(state => state.password.value)
-  const profileImage = useSelector(state => state.profile.value)
-  const FriendList = useSelector(state => state.friendList.value)
-  const [profile, setProfile] = useState()
-  const dispatch = useDispatch()
-  const friendList = useRef(null)
-  const search = useRef(null)
+  const [autoScroll, setAutoScroll] = useState(true);
+  const [scroll, setScroll] = useState("");
+  const [width, setWidth] = useState(0);
+  const [slideState, setSlideState] = useState("login");
+  const [loginSuccess, setLoginSuccess] = useState("");
+  const body = useRef(null);
+  const slide = useRef(null);
+  const myaccount = useRef(null);
+  const isLoggedIn = useSelector((state) => state.isLoggedIn.value);
+  const email = useSelector((state) => state.email.value);
+  const userName = useSelector((state) => state.userName.value);
+  const userId = useSelector((state) => state.userId.value);
+  const photos = useSelector((state) => state.photos.value);
+  const password = useSelector((state) => state.password.value);
+  const profileImage = useSelector((state) => state.profile.value);
+  const FriendList = useSelector((state) => state.friendList.value);
+  const [profile, setProfile] = useState();
+  const dispatch = useDispatch();
+  const friendList = useRef(null);
+  const search = useRef(null);
   const edit = useRef(null);
-  const [ users, setUsers] = useState([])
-  const [ friends, setFriends] = useState([])
-
+  const gallery = useRef(null);
+  const addphotos = useRef(null);
+  const [users, setUsers] = useState([]);
+  const [friends, setFriends] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   // functions
   const leftFirstClick = () => {
@@ -225,12 +251,12 @@ function App() {
     }
   };
   const handleLogin = (event) => {
-    event.preventDefault()
-    setLoginSuccess("")
+    event.preventDefault();
+    setLoginSuccess("");
     let data = {
-      email_id:email,
-      password:password
-    }
+      email_id: email,
+      password: password,
+    };
     axios
       .post(`${url}/login`, data)
       .then(function (response) {
@@ -239,9 +265,10 @@ function App() {
           dispatch(updateIsLoggedIn());
           dispatch(updateUserName(response.data.Items[0].UserName));
           dispatch(updateProfile(response.data.Items[0].ProfileImageURL));
-          dispatch(updatePassword(""))
-          dispatch(updateFriendList(response.data.Items[0].FriendList))
-          dispatch(updateUserId(response.data.Items[0].UserId))
+          dispatch(updatePassword(""));
+          dispatch(updateFriendList(response.data.Items[0].FriendList));
+          dispatch(updateUserId(response.data.Items[0].UserId));
+          dispatch(updatePhotos(response.data.Items[0].photos));
           slide.current.style.transform = "translateX(600px)";
         } else {
           setLoginSuccess(response.data.message);
@@ -252,16 +279,16 @@ function App() {
       .catch(function (error) {
         console.log(error);
       });
-  }
+  };
 
   const handleSignup = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     setLoginSuccess("");
     let data = {
       userId: uniqid(),
       username: userName,
       email_id: email,
-      password: password
+      password: password,
     };
     axios
       .post(`${url}/signup`, data)
@@ -283,13 +310,13 @@ function App() {
       .catch(function (error) {
         console.log(error);
       });
-  }
+  };
 
   const imageHandler = (e) => {
     const data = new FormData();
     data.append("profile", e.target.files[0]);
-    setProfile(e.target.files)
-  }
+    setProfile(e.target.files);
+  };
 
   const handleLogout = () => {
     myaccount.current.style.transform = "translateX(600px)";
@@ -299,15 +326,16 @@ function App() {
     dispatch(updateEmail(""));
     dispatch(updatePassword(""));
     dispatch(updateUserName(""));
-    dispatch(updateUserId(""))
-    dispatch(updateProfile(""))
-    dispatch(updateFriendList([]))
-  }
+    dispatch(updateUserId(""));
+    dispatch(updateProfile(""));
+    dispatch(updateFriendList([]));
+    dispatch(updatePhotos([]));
+  };
 
   const editImage = () => {
     myaccount.current.style.transform = "translateX(600px)";
     edit.current.style.transform = "translateX(0px)";
-  }
+  };
 
   const uploadImageHandler = (e) => {
     e.preventDefault();
@@ -316,7 +344,7 @@ function App() {
     const data = new FormData();
     console.log(profile);
     data.append("file", profile[0]);
-    data.append("UserId", userId)
+    data.append("UserId", userId);
     axios
       .post(`${url}/upload`, data, {
         headers: {
@@ -327,44 +355,116 @@ function App() {
         dispatch(updateProfile(res.data.Location));
       })
       .catch((err) => console.log(err));
-  }
+  };
+
+  const uploadPhotos = (e) => {
+    e.preventDefault();
+    addphotos.current.style.transform = "translateX(600px)";
+    gallery.current.style.transform = "translateX(0px)";
+    const data = new FormData();
+    console.log(profile);
+    data.append("file", profile[0]);
+    data.append("UserId", userId);
+    console.log(userId);
+    axios
+      .post(`${url}/addphotos`, data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => {
+        dispatch(updatePhotos([...photos, res.data.Location]));
+        console.log(photos);
+      })
+      .catch((err) => console.log(err));
+  };
 
   const searchList = () => {
-    axios.get(`${url}/peoples`)
-      .then(res => {
-        if (users.length!==res.data)
-          setUsers(pre=>[...res.data])
-    })
-    .catch(err=>console.log(err))
-    search.current.style.transform = "translateX(0px)"
-      
-  }
+    axios
+      .get(`${url}/peoples`)
+      .then((res) => {
+        if (users.length !== res.data) setUsers((pre) => [...res.data]);
+      })
+      .catch((err) => console.log(err));
+    search.current.style.transform = "translateX(0px)";
+  };
   const friendListSlide = () => {
     let data = {
-      friendList:[...FriendList]
-    }
-    axios.post(`${url}/friends`, data)
-      .then(res => {
+      friendList: [...FriendList],
+    };
+    axios
+      .post(`${url}/friends`, data)
+      .then((res) => {
         console.log(res.data);
-        if (friends.length!==res.data.length)
-          setFriends(pre=>[...res.data])
+        if (friends.length !== res.data.length)
+          setFriends((pre) => [...res.data]);
       })
-    .catch(err=>console.log(err))
-    friendList.current.style.transform = "translateX(0px)"
+      .catch((err) => console.log(err));
+    friendList.current.style.transform = "translateX(0px)";
+  };
+
+  const myPhotosTab = () => {
+    gallery.current.style.transform = "translateX(0px)";
+  };
+
+  const addPhotosTab = () => {
+    addphotos.current.style.transform = "translateX(0px)";
+    gallery.current.style.transform = "translateX(-800px)";
+  };
+
+  const openModal = (index) => {
+    setCurrentIndex(index)
+    setIsModalOpen(true)
   }
 
-
-  const ctitle = ["Aesop K11 Musea", "Aesop New Town Plaza", 'Aesop Hollywood Road'];
+  const ctitle = [
+    "Aesop K11 Musea",
+    "Aesop New Town Plaza",
+    "Aesop Hollywood Road",
+  ];
   useEffect(() => {
-    setWidth(window.innerWidth)
-  }, [])
+    setWidth(window.innerWidth);
+  }, []);
   useEffect(() => {
-    if(autoScroll){
-      var interval = setInterval(() => setCarousel(pre=>(pre+1)%3), 4000);
+    if (autoScroll) {
+      var interval = setInterval(
+        () => setCarousel((pre) => (pre + 1) % 3),
+        4000
+      );
     }
-      return ()=>clearInterval(interval)
-  }, [autoScroll])
+    return () => clearInterval(interval);
+  }, [autoScroll]);
 
+  useEffect(() => {
+    const checkIfClickedOutside = (e) => {
+      if (gallery.current && !gallery.current.contains(e.target)) {
+        gallery.current.style.transform = "translateX(-800px)";
+      }
+    };
+
+    document.addEventListener("mousedown", checkIfClickedOutside);
+
+    return () => {
+      // Cleanup the event listener
+      document.removeEventListener("mousedown", checkIfClickedOutside);
+    };
+  }, []);
+  useEffect(() => {
+    const checkIfClickedOutside = (e) => {
+      // If the menu is open and the clicked target is not within the menu,
+      // then close the menu
+      if (search.current && !search.current.contains(e.target)) {
+        search.current.style.transform = "translateX(-600px)";
+      }
+    };
+
+    document.addEventListener("mousedown", checkIfClickedOutside);
+
+    return () => {
+      // Cleanup the event listener
+      document.removeEventListener("mousedown", checkIfClickedOutside);
+    };
+  }, []);
 
   return (
     <StyledApp
@@ -377,11 +477,19 @@ function App() {
         }
       }}
     >
+      {isModalOpen ? (
+        <Modal
+          photoList={photos}
+          index={currentIndex}
+          close={() => setIsModalOpen(false)}
+        />
+      ) : null}
+
       <StyledSlide ref={edit}>
         <div style={{ display: "flex", flexDirection: "column" }}>
           <h6
             onClick={() => {
-              slide.current.style.transform = "translateX(600px)";
+              edit.current.style.transform = "translateX(600px)";
             }}
             style={{ marginLeft: "-100px", fontSize: "1.5rem" }}
           >
@@ -390,17 +498,17 @@ function App() {
           <h3>Edit Image</h3>
           <br />
           <form
-            // onSubmit={(event) => handleLogin(event)}
+            onSubmit={(e) => uploadImageHandler(e)}
             style={{ display: "flex", flexDirection: "column" }}
           >
             <br />
-            <label htmlFor="password_input">Enter password</label>
             <input
               id="image_input"
               type="file"
               name="profile"
               onChange={(e) => imageHandler(e)}
               required
+              autoFocus
             />
             <br />
             <button
@@ -414,7 +522,6 @@ function App() {
                 color: "#fff",
               }}
               className="btn"
-              onClick={(e) => uploadImageHandler(e)}
             >
               Save Changes
             </button>
@@ -496,6 +603,7 @@ function App() {
                 placeholder="email"
                 onChange={(e) => dispatch(updateEmail(e.target.value))}
                 required
+                autoFocus
               />
               <br />
               <label htmlFor="password_input">Enter password</label>
@@ -554,6 +662,7 @@ function App() {
                 value={userName}
                 placeholder="name"
                 required
+                autoFocus
               />
               <br />
               <label htmlFor="email_input">Enter email</label>
@@ -642,6 +751,7 @@ function App() {
           <StyledList ref={search}>
             <div>
               <ImCross
+                style={{ marginTop: "5vh" }}
                 onClick={() => {
                   search.current.style.transform = "translateX(-600px)";
                 }}
@@ -652,7 +762,7 @@ function App() {
                     key={index}
                     my_id={userId}
                     friend_id={user.UserId}
-                    friend_list = {FriendList}
+                    friend_list={FriendList}
                     userName={user.UserName}
                     profileImage={user.ProfileImageURL}
                   />
@@ -660,6 +770,90 @@ function App() {
               })}
             </div>
           </StyledList>
+          <StyledSlide ref={addphotos}>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <h6
+                onClick={() => {
+                  addphotos.current.style.transform = "translateX(600px)";
+                }}
+                style={{ marginLeft: "-100px", fontSize: "1.5rem" }}
+              >
+                <AiOutlineArrowRight />
+              </h6>
+              <h3>Add photos</h3>
+              <br />
+              <form
+                onSubmit={(event) => uploadPhotos(event)}
+                style={{ display: "flex", flexDirection: "column" }}
+              >
+                <br />
+                <input
+                  id="add_photos"
+                  type="file"
+                  name="photos"
+                  onChange={(e) => imageHandler(e)}
+                  required
+                  autoFocus
+                />
+                <br />
+                <button
+                  type="submit"
+                  style={{
+                    padding: "10px 30px",
+                    backgroundColor: "#b8d0cb",
+                    width: "fit-content",
+                    border: "none",
+                    fontWeight: "900",
+                    color: "#fff",
+                  }}
+                  className="btn"
+                >
+                  Save Changes
+                </button>
+              </form>
+            </div>
+          </StyledSlide>
+          <StyledTab ref={gallery}>
+            <div>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <ImCross
+                  style={{ marginTop: "5vh" }}
+                  onClick={() => {
+                    gallery.current.style.transform = "translateX(-800px)";
+                  }}
+                />
+                <button
+                  style={{
+                    padding: "10px 30px",
+                    backgroundColor: "#b8d0cb",
+                    width: "fit-content",
+                    border: "none",
+                    fontWeight: "900",
+                    color: "#fff",
+                    marginTop: "5vh",
+                    borderRadius: "20px",
+                  }}
+                  className="btn"
+                  onClick={() => addPhotosTab()}
+                >
+                  Add photos
+                </button>
+              </div>
+              <div className="gallery">
+                {photos.map((photo, index) => {
+                  return (
+                    <img
+                      style={{ height: "150px", width: "200px" }}
+                      src={photo}
+                      alt="gallery"
+                      key={index}
+                      onClick={()=>openModal(index)}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          </StyledTab>
           <StyledList ref={friendList}>
             <div>
               <ImCross
@@ -668,7 +862,11 @@ function App() {
                 }}
               />
               {friends.map((user, index) => (
-                <Friend key={index} userName={user.UserName} profileImage={user.ProfileImageURL} />
+                <Friend
+                  key={index}
+                  userName={user.UserName}
+                  profileImage={user.ProfileImageURL}
+                />
               ))}
             </div>
           </StyledList>
@@ -681,6 +879,11 @@ function App() {
             {isLoggedIn ? (
               <StyledNavLink onClick={() => searchList()}>
                 Peoples
+              </StyledNavLink>
+            ) : null}
+            {isLoggedIn ? (
+              <StyledNavLink onClick={() => myPhotosTab()}>
+                My photos
               </StyledNavLink>
             ) : null}
             <StyledNavLink>Search</StyledNavLink>

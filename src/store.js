@@ -6,6 +6,7 @@ import passwordReducer from "./features/password/passwordSlice";
 import profileReducer from "./features/profileImage/profileImageSlice";
 import friendListReducer from "./features/friendList/friendListSlice";
 import userIdSliceReducer from "./features/userId/userIdSlice";
+import photoSliceReducer from "./features/photos/photoSlice";
 
 export default configureStore({
   reducer: {
@@ -15,6 +16,7 @@ export default configureStore({
     password: passwordReducer,
     profile: profileReducer,
     friendList: friendListReducer,
-    userId: userIdSliceReducer
+    userId: userIdSliceReducer,
+    photos: photoSliceReducer,
   },
 });
