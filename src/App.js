@@ -76,9 +76,9 @@ import { updateFriendList } from "./features/friendList/friendListSlice";
 import "./App.css";
 import { updateUserId } from "./features/userId/userIdSlice";
 import uniqid from "uniqid";
-// const url = "http://ec2-65-0-110-92.ap-south-1.compute.amazonaws.com";
-const url = "https://api.guwahatioptical.co.in";
-// const url = "http://localhost:5000";
+
+// const url = "https://api.guwahatioptical.co.in";
+const url = "http://localhost:5000";
 
 function People({ my_id, friend_id, friend_list, userName, profileImage }) {
   const dispatch = useDispatch();
@@ -188,15 +188,15 @@ function Modal({close}) {
 
   return (
     <div className="Modal">
-      <ImCross style={{ right: "0", color: "#fff" }} onClick={() => close()} />
+      <ImCross className="pointer" style={{ position:"fixed", top:"5vh", right: "5vw", color: "#fff" }} onClick={() => close()} />
       <div className="ModalContent">
-        <IoIosArrowBack onClick={()=>pre()} style={{ top: "50%" }} />
+        <IoIosArrowBack className="change" onClick={()=>pre()} style={{ position:"fixed", left:"10vw", top: "50%" }} />
         <img
-          style={{ height: "500px", width: "600px" }}
+          style={{ height: "80vh", width: "65vw" }}
           src={photos[index]}
           alt="gallery"
         />
-        <IoIosArrowForward onClick={()=>next()} style={{ top: "50%" }} />
+        <IoIosArrowForward className="change" onClick={()=>next()} style={{ position:"fixed", right:"10vw", top: "50%" }} />
       </div>
     </div>
   );
@@ -285,7 +285,7 @@ function App() {
       })
       .then(function (response) {
         console.log(response);
-        if (response.data.Items[0]) {
+        if (response.data.Items) {
           dispatch(updateIsLoggedIn());
           dispatch(updateUserName(response.data.Items[0].UserName));
           dispatch(updateProfile(response.data.Items[0].ProfileImageURL));
@@ -526,7 +526,7 @@ function App() {
             }}
             style={{ marginLeft: "-100px", fontSize: "1.5rem" }}
           >
-            <AiOutlineArrowRight />
+            <AiOutlineArrowRight className="pointer" />
           </h6>
           <h3>Edit Image</h3>
           <br />

@@ -30,3 +30,18 @@
     display: flex;
     color: #fff;
 }
+
+.change{
+    transition: ease-in-out 0.2s;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.change:hover{
+    transform: scale(1.5);
+    font-weight: 900;
+}
+
+.pointer{
+    cursor: pointer;
+}
