@@ -76,7 +76,7 @@ import { updateFriendList } from "./features/friendList/friendListSlice";
 import "./App.css";
 import { updateUserId } from "./features/userId/userIdSlice";
 import uniqid from "uniqid";
-const url = "http://ec2-13-232-120-51.ap-south-1.compute.amazonaws.com";
+const url = "http://ec2-65-0-110-92.ap-south-1.compute.amazonaws.com";
 // const url = "http://localhost:5000";
 
 function People({ my_id, friend_id, friend_list, userName, profileImage }) {
