@@ -77,8 +77,8 @@ import "./App.css";
 import { updateUserId } from "./features/userId/userIdSlice";
 import uniqid from "uniqid";
 
-// const url = "https://api.guwahatioptical.co.in";
-const url = "http://localhost:5000";
+const url = "https://api.guwahatioptical.co.in";
+// const url = "http://localhost:5000";
 
 function People({ my_id, friend_id, friend_list, userName, profileImage }) {
   const dispatch = useDispatch();
