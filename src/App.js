@@ -98,7 +98,12 @@ function People({ my_id, friend_id, friend_list, userName, profileImage }) {
       friend_id,
     };
     axios
-      .post(`${url}/addfriend`, data)
+      .post(`${url}/addfriend`, data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          "Access-Control-Allow-Origin": "*",
+        },
+      })
       .then((res) => {
         setBtn("Remove friend");
         console.log(res.data);
@@ -272,7 +277,12 @@ function App() {
       password: password,
     };
     axios
-      .post(`${url}/login`, data)
+      .post(`${url}/login`, data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          "Access-Control-Allow-Origin": "*",
+        },
+      })
       .then(function (response) {
         console.log(response);
         if (response.data.Items[0]) {
@@ -305,7 +315,12 @@ function App() {
       password: password,
     };
     axios
-      .post(`${url}/signup`, data)
+      .post(`${url}/signup`, data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          "Access-Control-Allow-Origin": "*",
+        },
+      })
       .then(function (response) {
         console.log(response);
         if (response.data.message) {
@@ -363,6 +378,7 @@ function App() {
       .post(`${url}/upload`, data, {
         headers: {
           "Content-Type": "multipart/form-data",
+          'Access-Control-Allow-Origin': '*'
         },
       })
       .then((res) => {
@@ -384,6 +400,7 @@ function App() {
       .post(`${url}/addphotos`, data, {
         headers: {
           "Content-Type": "multipart/form-data",
+          "Access-Control-Allow-Origin": "*",
         },
       })
       .then((res) => {
@@ -407,7 +424,12 @@ function App() {
       friendList: [...FriendList],
     };
     axios
-      .post(`${url}/friends`, data)
+      .post(`${url}/friends`, data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          "Access-Control-Allow-Origin": "*",
+        },
+      })
       .then((res) => {
         console.log(res.data);
         if (friends.length !== res.data.length)
