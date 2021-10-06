@@ -100,7 +100,6 @@ function People({ my_id, friend_id, friend_list, userName, profileImage }) {
     axios
       .post(`${url}/addfriend`, data, {
         headers: {
-          "Content-Type": "multipart/form-data",
           "Access-Control-Allow-Origin": "*",
         },
       })
@@ -276,10 +275,10 @@ function App() {
       email_id: email,
       password: password,
     };
+    console.log(data);
     axios
       .post(`${url}/login`, data, {
         headers: {
-          "Content-Type": "multipart/form-data",
           "Access-Control-Allow-Origin": "*",
         },
       })
@@ -317,7 +316,6 @@ function App() {
     axios
       .post(`${url}/signup`, data, {
         headers: {
-          "Content-Type": "multipart/form-data",
           "Access-Control-Allow-Origin": "*",
         },
       })
@@ -426,7 +424,6 @@ function App() {
     axios
       .post(`${url}/friends`, data, {
         headers: {
-          "Content-Type": "multipart/form-data",
           "Access-Control-Allow-Origin": "*",
         },
       })
